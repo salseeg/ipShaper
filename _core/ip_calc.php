@@ -26,6 +26,10 @@ class ipv4RangeCalc {
 	function get_abons_ips(){
 		return array_map("long2ip", range($this->ip_l + 2, $this->ip_l + $this->amount - 2));
 	}
+	function is_ip_in($ip){
+		$ipl = ip2long($ip);
+		return (($ipl >= $this->ip_l) and ($ipl <= ($this->ip_l + $this->amount - 1)));
+	}
 }
 
 //$calc = new ipv4RangeCalc('89.185.10.200', 25);
