@@ -1,7 +1,12 @@
 <?php
 
 class ipv4RangeCalc {
-	function __construct($ip, $mask_len){
+/**
+ *
+ * @param string $ip 
+ * @param int $mask_len 
+ */	
+    function __construct($ip, $mask_len){
 		$offset = 32 - $mask_len;
 		$this->ip = $ip;
 		$this->mask_len = $mask_len;
@@ -9,6 +14,10 @@ class ipv4RangeCalc {
 		$this->amount = pow(2, 32 - $mask_len);
 	}
 
+        /** 
+         *
+         * @return string ip
+         */
 	function get_net_ip(){
 		return long2ip($this->ip_l);
 	}
