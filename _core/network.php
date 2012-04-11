@@ -12,13 +12,40 @@ class Network {
 		}
 		return false;
 	}
+
+	static function init_shaper_structures(){
+		$class_offset = 17;
+		$ht1_offset = 17;
+		$ht2_offset = 257;
+		foreach (self::$ranges as & $r){
+			$r = new ipv4ShaperRangeCalc($r->ip, $r->mask_len, $class_offset, $ht1_offset, $ht2_offset);
+			$amount = $r->amount;
+			$ht2_amount = ceil($amount / 256.0);
+			$class_offset += $amount;
+			$ht1_offset += 1;
+			$ht2_offset += $ht2_amount;
+		}
+	}
+	/**
+	 *
+	 * @param string $ip
+	 * @return ipv4ShaperRangeCalc 
+	 */
+	static function range_by_ip($ip){
+		foreach (self::$ranges as & $r){
+			if ($r->is_ip_in($ip)){
+				return $r;
+			}	
+		}
+	}
+	
 }
 
 Network::$ranges['89.185.8.0/21'] = new ipv4RangeCalc('89.185.8.0',21);
 Network::$ranges['89.185.16.0/21'] = new ipv4RangeCalc('89.185.16.0',21);
 Network::$ranges['93.185.222.0/23'] = new ipv4RangeCalc('93.185.222.0',23);
 Network::$ranges['93.185.216.0/23'] = new ipv4RangeCalc('93.185.216.0',23);
-Network::$ranges['93.185.218.0/23'] = new ipv4RangeCalc('89.185.218.0',23);
+Network::$ranges['93.185.218.0/23'] = new ipv4RangeCalc('93.185.218.0',23);
 
 
 ?>
