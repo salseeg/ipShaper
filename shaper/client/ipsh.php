@@ -3,8 +3,8 @@
 
 require_once dirname(dirname(dirname(__FILE__))).'/_core/config.php';
 
-ipv4ShaperRangeCalc::$uplink_iface = 'lo:0';
-ipv4ShaperRangeCalc::$downlink_iface = 'lo:1';
+//ipv4ShaperRangeCalc::$uplink_iface = 'lo:0';
+//ipv4ShaperRangeCalc::$downlink_iface = 'lo:1';
 
 
 
