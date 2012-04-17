@@ -47,6 +47,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 				. $this->ip.'/'.$this->mask_len.' hashkey mask 0x0000'.dechex($divisor-1).'00 at 16 '
 				.'link '.dechex($this->ht1_offset).':'
 			;
+			//print_r ($rules);
 			
 			for ($i = 0; $i < $divisor; $i += 1){
 				// uplink
@@ -70,6 +71,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 				;
 			
 			}
+			//print_r($rules);
 		}else{
 			$divisor = 1 << (32- $this->mask_len);
 			$rules[] = self::tc." filter add dev ".self::$uplink_iface
