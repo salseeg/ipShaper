@@ -381,10 +381,10 @@ class ips {
 			print "$c \n";
 			$res = trim(`$c`);
 			//print $res;
-			//if ($res != ''){
-			//	print "--$res--\n";
-			//	break;
-			//}
+			if ($res != ''){
+				print "--$res--\n";
+				break;
+			}
 		}
 	}
 	/**
