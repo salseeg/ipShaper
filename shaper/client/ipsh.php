@@ -332,26 +332,26 @@ class ips {
 
 		$c = "ip a show  dev ".ipv4ShaperRangeCalc::$downlink_iface." | grep 'inet ' | head -n 1";
 		$r = trim(`$c`);
-		print_r ($r);
+		//print_r ($r);
 		$p = explode(' ', $r);
 		$r = $p[1];
-		print_r ($r);
+		//print_r ($r);
 		$p = explode('/', $r);
 		$my_downlink_ip = $p[0];
 
 		$c = "ip a show  dev ".ipv4ShaperRangeCalc::$uplink_iface." | grep 'inet ' | head -n 1";
 		$r = trim(`$c`);
-		print_r ($r);
+		//print_r ($r);
 		$p = explode(' ', $r);
 		$r = $p[1];
-		print_r ($r);
+		//print_r ($r);
 		$p = explode('/', $r);
 		$my_uplink_ip = $p[0];
 
 		
 		
 		$cmds = array_merge($cmds, Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000, 10000));
-		$cmds = array_merge($cmds, Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000, 10000));
+		$cmds = array_merge($cmds, Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000, 10000));
 		
 		//print "/sbin/tc filter add dev eth1 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
 		//print "/sbin/tc filter add dev eth2 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
