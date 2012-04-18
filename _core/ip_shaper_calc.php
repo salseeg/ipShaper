@@ -108,6 +108,8 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 
 		$ip_offset = (ip2long($ip) - $this->ip_l);
 		$class = $this->class_offset + $ip_offset;
+		$ip_ht2_offset = floor($ip_offset / 256);
+		$ip_offset -= $ip_ht2_offset * 256;
 
 		
 		// uplink
