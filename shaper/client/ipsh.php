@@ -362,11 +362,14 @@ class ips {
 			$cmds = array_merge($cmds,  Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000));
 			
 		}
-
-
+		$str = '';
+		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
 		foreach ($cmds as $c){
 			print "$c \n";
+			$str .= substr($c,$offset);
 		}
+		$fn = tempnam('/tmp/', 'ipsh');
+		file_put_contents($fn, $str);
 
 	}
 	/**
