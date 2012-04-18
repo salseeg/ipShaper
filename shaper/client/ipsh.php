@@ -366,7 +366,7 @@ class ips {
 		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
 		foreach ($cmds as $c){
 			print "$c \n";
-			$str .= substr($c,$offset);
+			$str .= substr($c,$offset)."\n";
 		}
 		$fn = tempnam('/tmp/', 'ipsh');
 		file_put_contents($fn, $str);
