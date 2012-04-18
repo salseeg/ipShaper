@@ -121,8 +121,8 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		;
 		$rules[] = self::tc.' filter replace dev '.self::$uplink_iface
 			.' parent 1: pref 20 handle '
-			.dechex($this->ht2_offset).':'.dechex($ip_offset).':800'
-			.' u32 ht '.dechex($this->ht2_offset).':'.dechex($ip_offset)
+			.dechex($this->ht2_offset + $ip_ht2_offset).':'.dechex($ip_offset).':800'
+			.' u32 ht '.dechex($this->ht2_offset + $ip_ht2_offset).':'.dechex($ip_offset)
 			.': match ip src '.$ip.' flowid 1:'.dechex($class)
 		;
 
@@ -135,21 +135,13 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		;
 		$rules[] = self::tc.' filter replace dev '.self::$downlink_iface
 			.' parent 1: pref 20 handle '
-			.dechex($this->ht2_offset).':'.dechex($ip_offset).':800'
-			.' u32 ht '.dechex($this->ht2_offset).':'.dechex($ip_offset)
+			.dechex($this->ht2_offset + $ip_ht2_offset).':'.dechex($ip_offset).':800'
+			.' u32 ht '.dechex($this->ht2_offset + $ip_ht2_offset).':'.dechex($ip_offset)
 			.': match ip dst '.$ip.' flowid 1:'.dechex($class)
 		;
 
 		
 
-/*	"	/sbin/tc class replace dev lo_in parent 1: classid 1:84 htb rate 9766kibit ceil 9766kibit quantum 1500
-/sbin/tc qdisc replace dev lo_in parent 1:84 handle 84:0 pfifo limit 50
-/sbin/tc filter replace dev lo_in parent 1: pref 20 handle 200:82:800 u32 ht 200:82: match ip dst 89.185.8.130 flowid 1:84
-/sbin/tc class replace dev lo_out parent 1: classid 1:84 htb rate 9766kibit ceil 9766kibit quantum 1500
-/sbin/tc qdisc replace dev lo_out parent 1:84 handle 84:0 pfifo limit 50
-/sbin/tc filter replace dev lo_out parent 1: pref 20 handle 200:82:800 u32 ht 200:82: match ip src 89.185.8.130 flowid 1:84
-";
-*/
 		return $rules;
 	}
 	
