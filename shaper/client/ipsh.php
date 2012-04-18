@@ -368,7 +368,7 @@ class ips {
 			print "$c \n";
 			$str .= substr($c,$offset)."\n";
 		}
-		$fn = tempnam('/tmp/', 'ipsh');
+		$fn = tempnam('/tmp/', 'ipsh_');
 		file_put_contents($fn, $str);
 
 	}
