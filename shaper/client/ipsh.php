@@ -490,8 +490,8 @@ class ips {
 		$speeds = shaper::get_current_speeds();
 
 		foreach ($speeds as $ip => $s){
-			$up = strntr($s['up'], array('000000' => ' Mbit', '000' => ' Kbit'));
-			$down = strntr($s['down'], array('000000' => ' Mbit', '000' => ' Kbit'));
+			$up = strtr($s['up'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
+			$down = strtr($s['down'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
 
 			print "$ip\t = \t $down \t $up \n";
 		}
