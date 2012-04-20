@@ -24,7 +24,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 			and 
 			($class < $this->class_offset + $this->amount )
 		){
-			return $this->ip_l + $class - $class_offset;
+			return $this->ip_l + $class - $this->class_offset;
 		}else{
 			return false;
 		}
