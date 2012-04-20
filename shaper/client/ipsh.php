@@ -487,6 +487,7 @@ class ips {
 		users_db::$db->sync_tariffs();
 	}
 	function show($args){
+		Network::init_shaper_structures();
 		shaper::get_current_speeds();
 		
 	}
