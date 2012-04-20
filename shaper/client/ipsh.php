@@ -289,7 +289,7 @@ class shaper {
 	static function get_current_speeds(){
 		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '";
 		$downspeeds = explode("\n", trim(`$cmd`));
-		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$up_iface." | cut -f 3,10 -d ' '";
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." | cut -f 3,10 -d ' '";
 		$upspeeds = explode("\n", trim(`$cmd`));
 			
 
