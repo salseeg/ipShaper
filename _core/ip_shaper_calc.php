@@ -18,6 +18,17 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		$this->ht1_offset = $ht1_offset;
 		$this->ht2_offset = $ht2_offset;
 	}
+	function ip_by_class($class){
+		if (
+			($class >= $this->class_offset )
+			and 
+			($class < $this->class_offset + $this->amount )
+		){
+			return $this->ip_l + $class - $class_offset;
+		}else{
+			return false;
+		}
+	}
 	function make_shaper_init_rules(& $rules){
 
 		if ($this->mask_len < 24){
