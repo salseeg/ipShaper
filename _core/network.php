@@ -35,8 +35,18 @@ class Network {
 		foreach (self::$ranges as & $r){
 			if ($r->is_ip_in($ip)){
 				return $r;
+				break;
 			}	
 		}
+	}
+	static function ip_by_class($class){
+		foreach (self::$ranges as & $r){
+			$ip = $r->ip_by_class($class); 
+			if ($ip){
+				return long2ip($ip);
+				break;
+			}	
+		}	
 	}
 	
 }

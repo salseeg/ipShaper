@@ -287,7 +287,29 @@ class users_db {
 class shaper {
 	static function get_current_speed_by_ip($ip){}
 	static function get_current_speeds(){
-		
+		$downspeeds_raw = trim(system(ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '"));
+		$upspeeds_raw = trim(system(ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." | cut -f 3,10 -d ' '"));
+
+		$classes = array();
+		$ips = array();
+		foreach(explode("\n", $downspeeds_raw) as $s){
+			$p = explode(' ', $s);
+			$class = explode(':', $p[0]);
+			$class = hexdec($class[0]);
+			$speed = strtr($p[1], array('bit' => ''));
+			$speed = strtr($speed, array('K' => '000'));
+			$classes[$class] = $speed;
+		}
+		foreach(explode("\n", $upspeeds_raw) as $s){
+			$p = explode(' ', $s);
+			$class = explode(':', $p[0]);
+			$class = hexdec($class[0]);
+			$speed = strtr($p[1], array('bit' => ''));
+			$speed = strtr($speed, array('K' => '000'));
+			$classes[$class] .= '/'.$speed;
+		}
+		print_r($classes);
+		return $ips;
 	}
 	static function set_speeds($tariff_speeds, $bonus_K = 1){
 		$cmds = array();
@@ -460,6 +482,10 @@ class ips {
 	function sync_tariffs(){
 		users_db::init();
 		users_db::$db->sync_tariffs();
+	}
+	function show($args){
+		shaper::get_current_speeds();
+		
 	}
 //	function  (){}
 //	function  (){}
