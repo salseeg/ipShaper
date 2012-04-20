@@ -287,13 +287,15 @@ class users_db {
 class shaper {
 	static function get_current_speed_by_ip($ip){}
 	static function get_current_speeds(){
-		$downspeeds_raw = trim(system(ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '"));
-		$upspeeds_raw = trim(system(ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." | cut -f 3,10 -d ' '"));
-		exit;
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '";
+		$downspeeds = explode("\n", trim(`$cmd`));
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$up_iface." | cut -f 3,10 -d ' '";
+		$upspeeds = explode("\n", trim(`$cmd`));
+			
 
 		$classes = array();
 		$ips = array();
-		foreach(explode("\n", $downspeeds_raw) as $s){
+		foreach($downspeeds as $s){
 			$p = explode(' ', $s);
 			$class = explode(':', $p[0]);
 			$class = hexdec($class[0]);
@@ -301,7 +303,7 @@ class shaper {
 			$speed = strtr($speed, array('K' => '000'));
 			$classes[$class] = $speed;
 		}
-		foreach(explode("\n", $upspeeds_raw) as $s){
+		foreach($upspeeds as $s){
 			$p = explode(' ', $s);
 			$class = explode(':', $p[0]);
 			$class = hexdec($class[0]);
