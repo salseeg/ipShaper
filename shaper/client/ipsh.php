@@ -294,8 +294,6 @@ class shaper {
 			
 
 		$classes = array();
-		$fr = Network::$ranges[array_shift(array_keys(Network::$ranges))];
-		$ip2class_offset = $fr->ip_l - $fr->class_offset;
 		$ips = array();
 		foreach($downspeeds as $s){
 			$p = explode(' ', $s);
@@ -303,7 +301,7 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[long2ip($class + $ip2class_offset)] = $speed;
+			$classes[long2ip(Network::ip_by_class($class))] = $speed;
 		}
 		foreach($upspeeds as $s){
 			$p = explode(' ', $s);
@@ -311,7 +309,7 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[long2ip($class + $ip2class_offset)] .= '/'.$speed;
+			$classes[long2ip(Network::ip_by_class($class))] .= '/'.$speed;
 		}
 		print_r($classes);
 		return $ips;
