@@ -18,8 +18,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		$this->ht1_offset = $ht1_offset;
 		$this->ht2_offset = $ht2_offset;
 	}
-	function make_shaper_init_rules(){
-		$rules = array();
+	function make_shaper_init_rules(& $rules){
 
 		if ($this->mask_len < 24){
 
@@ -97,14 +96,12 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 				.'link '.dechex($this->ht2_offset).':'
 			;
 		}
-		return $rules;
 	}
-	function make_shaper_speed_rules($ip, $up_speed, $down_speed){
+	function make_shaper_speed_rules($ip, $up_speed, $down_speed, & $rules){
 		if (! $this->is_ip_in($ip)){ 
 			return false;
 		}
 
-		$rules = array();
 
 		$ip_offset = (ip2long($ip) - $this->ip_l);
 		$class = $this->class_offset + $ip_offset;
@@ -142,7 +139,6 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 
 		
 
-		return $rules;
 	}
 	
 }
