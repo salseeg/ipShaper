@@ -301,7 +301,7 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[long2ip(Network::ip_by_class($class))] = $speed;
+			$classes[Network::ip_by_class($class)] = $speed;
 		}
 		foreach($upspeeds as $s){
 			$p = explode(' ', $s);
@@ -309,7 +309,7 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[long2ip(Network::ip_by_class($class))] .= '/'.$speed;
+			$classes[Network::ip_by_class($class)] .= '/'.$speed;
 		}
 		print_r($classes);
 		return $ips;
