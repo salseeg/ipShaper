@@ -324,7 +324,7 @@ class ips {
 			, ipv4ShaperRangeCalc::tc .' filter add dev '.ipv4ShaperRangeCalc::$downlink_iface.' parent 1:0 protocol ip pref 10 u32 '
 		);
 		foreach(Network::$ranges as $r){
-			$cmds = array_merge($cmds, $r->make_shaper_init_rules());
+			$r->make_shaper_init_rules($cmds);
 		}
 
 		$my_uplink_ip = '';
@@ -349,9 +349,13 @@ class ips {
 		$my_uplink_ip = $p[0];
 
 		
-		
-		$cmds = array_merge($cmds, Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000, 10000));
-		$cmds = array_merge($cmds, Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000, 10000));
+		// myself
+		Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000, 10000, $cmds);
+		Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000, 10000,$cmds);
+
+		// servers
+		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000, 10000, $cmds);
+		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000, 10000, $cmds);
 		
 		//print "/sbin/tc filter add dev eth1 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
 		//print "/sbin/tc filter add dev eth2 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
@@ -359,17 +363,20 @@ class ips {
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
 			$ip = long2ip($s['ip']);
-			$cmds = array_merge($cmds,  Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000));
-			
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000, $cmds);
 		}
 		$str = '';
 		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
 		foreach ($cmds as $c){
-			print "$c \n";
+			//print "$c \n";
 			$str .= substr($c,$offset)."\n";
 		}
 		$fn = tempnam('/tmp/', 'ipsh_');
 		file_put_contents($fn, $str);
+		//$cmd = "tc -b $fn";
+		$cmd = "cat $fn  > /tmp/batch";
+		`$cmd`;
+		unlink($fn);
 
 	}
 	/**
