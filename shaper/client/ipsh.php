@@ -284,39 +284,33 @@ class users_db {
 }
 
 
-class ips {
-	function __construct(){
-		$args = $_SERVER['argv'];
-		array_shift($args);
-		$action = array_shift($args);
-		$methods = get_class_methods($this);
-		if (in_array($action, $methods)){
-			$this->$action($args);
-		}else{
-			$this->help();
-		}
+class shaper {
+	static function get_current_speed_by_ip($ip){}
+	static function get_current_speeds(){
+		
 	}
-	function help(){
-		print "	ipsh <action> [arg [arg [..]]]	\n";
-		print "		\n";
-		print "	action:	\n";
-		print "		help	- 	\n";
-		print "		start	-  \n";
-		print "		stop	-  \n";
-		print "		sync_speed\n";
-		print "			- \n";
-		print "		sync_tariffs\n";
-		print "			- \n";
-		print "		\n";
-			
-	}
-	/**
-	 *  starts shaper tc rules and syncing shaper with db
-	 */
-	function start(){
-		users_db::init();
-		Network::init_shaper_structures();
+	static function set_speeds($tariff_speeds, $bonus_K = 1){
+		$cmds = array();
 
+		$speeds = $tariff_speeds;		
+		foreach ($speeds as $s){
+			$ip = long2ip($s['ip']);
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000, $cmds);
+		}
+		$str = '';
+		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
+		foreach ($cmds as $c){
+			//print "$c \n";
+			$str .= substr($c,$offset)."\n";
+		}
+		$fn = tempnam('/tmp/', 'ipsh_');
+		file_put_contents($fn, $str);
+		$cmd = "tc -b $fn";
+		`$cmd`;
+		unlink($fn);
+	}
+
+	static function init(){
 		$cmds = array(
 			ipv4ShaperRangeCalc::tc .' qdisc add dev '.ipv4ShaperRangeCalc::$uplink_iface.' root handle 1: htb '
 			, ipv4ShaperRangeCalc::tc .' filter add dev '.ipv4ShaperRangeCalc::$uplink_iface.' parent 1:0 protocol ip pref 10 u32 '
@@ -357,8 +351,8 @@ class ips {
 		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000, 10000, $cmds);
 		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000, 10000, $cmds);
 		
-		//print "/sbin/tc filter add dev eth1 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
-		//print "/sbin/tc filter add dev eth2 parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop\n";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
@@ -373,29 +367,77 @@ class ips {
 		}
 		$fn = tempnam('/tmp/', 'ipsh_');
 		file_put_contents($fn, $str);
-		//$cmd = "tc -b $fn";
-		$cmd = "cat $fn  > /tmp/batch";
+		$cmd = "tc -b $fn";
 		`$cmd`;
 		unlink($fn);
 
+
+		
 	}
-	/**
-	 * stoping shaper
-	 */
-	function stop(){
+
+	static function stop(){
 		$cmds = array(
 			ipv4ShaperRangeCalc::tc .' qdisc del dev '.ipv4ShaperRangeCalc::$uplink_iface.' root handle 1: htb '
 			, ipv4ShaperRangeCalc::tc .' qdisc del dev '.ipv4ShaperRangeCalc::$downlink_iface.' root handle 1: htb '
 		);
 		foreach ($cmds as $c){
-			print "$c \n";
 			$res = trim(`$c`);
-			//print $res;
-			if ($res != ''){
-				print "--$res--\n";
-				break;
-			}
 		}
+		
+	}
+	
+}
+
+class ips {
+	function __construct(){
+		$args = $_SERVER['argv'];
+		array_shift($args);
+		$action = array_shift($args);
+		$methods = get_class_methods($this);
+		if (in_array($action, $methods)){
+			$this->$action($args);
+		}else{
+			$this->help();
+		}
+	}
+	function help(){
+		print "	ipsh <action> [arg [arg [..]]]	\n";
+		print "		\n";
+		print "	action:	\n";
+		print "		help	- 	\n";
+		print "		start	-  \n";
+		print "		stop	-  \n";
+		print "		sync_speed\n";
+		print "			- \n";
+		print "		sync_tariffs\n";
+		print "			- \n";
+		print "	Supposed crons	\n";
+		print "		30 3 * * *  ipsh sync_tariffs\n";
+		print "		\n";
+		print "		\n";
+		print "		\n";
+		print "		\n";
+			
+	}
+	/**
+	 *  starts shaper tc rules and syncing shaper with db
+	 */
+	function start(){
+		users_db::init();
+		Network::init_shaper_structures();
+
+		$speeds = users_db::$db->get_speeds();
+
+		shaper::init();
+		shaper::set_speeds($speeds);
+
+		
+	}
+	/**
+	 * stoping shaper
+	 */
+	function stop(){
+		shaper::stop();
 	}
 	/**
 	 * syncing speed with billing and shaper (storing chanfges in db) including speed bonus
