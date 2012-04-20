@@ -311,7 +311,7 @@ class shaper {
 			$speed = strtr($speed, array('K' => '000'));
 			$classes[Network::ip_by_class($class)]['up'] = $speed;
 		}
-		return $speed;
+		return $classes;
 	}
 	static function set_speeds($tariff_speeds, $bonus_K = 1){
 		$cmds = array();
