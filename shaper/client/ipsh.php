@@ -298,7 +298,7 @@ class shaper {
 		foreach($downspeeds as $s){
 			$p = explode(' ', $s);
 			$class = explode(':', $p[0]);
-			$class = hexdec($class[0]);
+			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
 			$classes[$class] = $speed;
@@ -306,7 +306,7 @@ class shaper {
 		foreach($upspeeds as $s){
 			$p = explode(' ', $s);
 			$class = explode(':', $p[0]);
-			$class = hexdec($class[0]);
+			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
 			$classes[$class] .= '/'.$speed;
