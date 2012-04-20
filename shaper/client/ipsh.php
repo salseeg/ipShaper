@@ -301,7 +301,7 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[Network::ip_by_class($class)] = $speed;
+			$classes[Network::ip_by_class($class)] = array('down' => $speed);
 		}
 		foreach($upspeeds as $s){
 			$p = explode(' ', $s);
@@ -309,10 +309,9 @@ class shaper {
 			$class = hexdec($class[1]);
 			$speed = strtr($p[1], array('bit' => ''));
 			$speed = strtr($speed, array('K' => '000'));
-			$classes[Network::ip_by_class($class)] .= '/'.$speed;
+			$classes[Network::ip_by_class($class)]['up'] = $speed;
 		}
-		print_r($classes);
-		return $ips;
+		return $speed;
 	}
 	static function set_speeds($tariff_speeds, $bonus_K = 1){
 		$cmds = array();
@@ -488,7 +487,14 @@ class ips {
 	}
 	function show($args){
 		Network::init_shaper_structures();
-		shaper::get_current_speeds();
+		$speeds = shaper::get_current_speeds();
+
+		foreach ($speeds as $ip => $s){
+			$up = strntr($s['up'], array('000000' => ' Mbit', '000' => ' Kbit'));
+			$down = strntr($s['down'], array('000000' => ' Mbit', '000' => ' Kbit'));
+
+			print "$ip\t = \t $down \t $up \n";
+		}
 		
 	}
 //	function  (){}
