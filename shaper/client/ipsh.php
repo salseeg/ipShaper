@@ -285,7 +285,20 @@ class users_db {
 
 
 class shaper {
-	static function get_current_speed_by_ip($ip){}
+	static function get_current_speed_by_ip($ip){
+		$range = Network::range_by_ip($ip);
+		$class = $range->class_offset + ip2long($ip) - $range->ip_l;
+		$classid = '1:'.dechex($class);
+		
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." classid $classid | cut -f 3,10 -d ' '";
+		$downspeed = strtr(trim(`$cmd`), array('K' => '000', 'bit' => ''));
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." classid $classid | cut -f 3,10 -d ' '";
+		$upspeed = strtr(trim(`$cmd`), array('K' => '000', 'bit' =>''));
+
+		return array('up' => $upspeed, 'down' => $downspeed);
+
+		
+	}
 	static function get_current_speeds(){
 		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '";
 		$downspeeds = explode("\n", trim(`$cmd`));
@@ -487,13 +500,24 @@ class ips {
 	}
 	function show($args){
 		Network::init_shaper_structures();
-		$speeds = shaper::get_current_speeds();
 
-		foreach ($speeds as $ip => $s){
+		if ($args and count($args) == 1){
+			$ip = $args[0];
+			$s = shaper::get_current_speed_by_ip($ip);
 			$up = strtr($s['up'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
 			$down = strtr($s['down'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
-
+			
 			print "$ip\t = \t $down \t $up \n";
+			
+		}else{
+			$speeds = shaper::get_current_speeds();
+
+			foreach ($speeds as $ip => $s){
+				$up = strtr($s['up'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
+				$down = strtr($s['down'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
+
+				print "$ip\t = \t $down \t $up \n";
+			}
 		}
 		
 	}
