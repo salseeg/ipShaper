@@ -290,9 +290,9 @@ class shaper {
 		$class = $range->class_offset + ip2long($ip) - $range->ip_l;
 		$classid = '1:'.dechex($class);
 		
-		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." classid $classid | cut -f 3,10 -d ' '";
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." classid $classid | cut -f 10 -d ' '";
 		$downspeed = strtr(trim(`$cmd`), array('K' => '000', 'bit' => ''));
-		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." classid $classid | cut -f 3,10 -d ' '";
+		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$uplink_iface." classid $classid | cut -f 10 -d ' '";
 		$upspeed = strtr(trim(`$cmd`), array('K' => '000', 'bit' =>''));
 
 		return array('up' => $upspeed, 'down' => $downspeed);
