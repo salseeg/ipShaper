@@ -264,7 +264,7 @@ class users_db {
 	}
 	/**
 	 *
-	 * @return array [ip] => array(ip => long, up_speed => kbits, down_speed => kbits, bonus_enabled => bool, always_enabled => bool )
+	 * @return array [ip] => array(ip => long, up_speed => bits, down_speed => bits, bonus_enabled => bool, always_enabled => bool )
 	 */
 	function get_speeds(){
 		$speeds = $this->query_array(
@@ -387,7 +387,8 @@ class shaper {
 		}
 
 		foreach ($to_check as $ip){
-			$up_diff = abs($current_speeds[$ip]['up'] - $s[$ip]['up_speed']);
+			$s = $speeds[$ip];
+			$up_diff = abs($current_speeds[$ip]['up'] - $s[$ip]['up_speed'] );
 			$down_diff = abs($current_speeds[$ip]['down'] - $s[$ip]['down_speed']);
 
 			if (($up_diff > 1000)
@@ -450,12 +451,12 @@ class shaper {
 
 		
 		// myself
-		Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000, 10000, $cmds);
-		Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000, 10000,$cmds);
+		Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000000, 10000000, $cmds);
+		Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000000, 10000000,$cmds);
 
 		// servers
-		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000, 10000, $cmds);
-		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000, 10000, $cmds);
+		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000000, 10000000, $cmds);
+		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000000, 10000000, $cmds);
 		
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
@@ -463,7 +464,7 @@ class shaper {
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
 			$ip = long2ip($s['ip']);
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000, $cmds);
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
 		}
 		$str = '';
 		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
