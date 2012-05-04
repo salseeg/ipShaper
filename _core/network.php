@@ -39,6 +39,12 @@ class Network {
 			}	
 		}
 	}
+	/**
+	 * Возвращает ИП адресс для класса
+	 * 
+	 * @param int $class
+	 * @return string ip 
+	 */
 	static function ip_by_class($class){
 		foreach (self::$ranges as & $r){
 			$ip = $r->ip_by_class($class); 
@@ -47,6 +53,7 @@ class Network {
 				break;
 			}	
 		}	
+		return false;
 	}
 	
 }

@@ -262,6 +262,10 @@ class users_db {
 		
 		//print_r($main_tariffs);
 	}
+	/**
+	 *
+	 * @return array [ip] => array(ip => long, up_speed => kbits, down_speed => kbits, bonus_enabled => bool, always_enabled => bool )
+	 */
 	function get_speeds(){
 		$speeds = $this->query_array(
 			" select
@@ -277,7 +281,9 @@ class users_db {
 			"
 			, 'ip'
 		);
-		return $speeds;
+		$keys = array_keys($speeds);
+		$keys = array_map('long2ip', $keys);
+		return array_combine($keys, array_values($speeds));
 	}
 	static function init(){
 		if (!self::$db){
@@ -304,6 +310,11 @@ class shaper {
 
 		
 	}
+	/**
+	 *	Возвращает массив текущих скорорстей на шейпере
+	 * 
+	 * @return array [ip] => array( 'up' => bits, 'down' => bits)
+	 */
 	static function get_current_speeds(){
 		$cmd = ipv4ShaperRangeCalc::tc." class show dev ".ipv4ShaperRangeCalc::$downlink_iface." | cut -f 3,10 -d ' '";
 		$downspeeds = explode("\n", trim(`$cmd`));
