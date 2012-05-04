@@ -80,11 +80,15 @@ class users_db {
 			"
 		);
 	}
-	function query_array($sql){
+	function query_array($sql, $index = false){
 		$ret = array();
 		$res = $this->_db->query($sql);
 		while ($row = $res->fetchArray(SQLITE3_ASSOC)){
-			$ret[] = $row;
+			if ($index){
+				$ret[$row[$index]] = $row;
+			}else{
+				$ret[] = $row;
+			}
 		}
 		return $ret;
 	}
@@ -271,6 +275,7 @@ class users_db {
 				left join tariffs t
 				on a.tariff_id = t.id
 			"
+			, 'ip'
 		);
 		return $speeds;
 	}
@@ -328,12 +333,60 @@ class shaper {
 	}
 	static function set_speeds($tariff_speeds, $bonus_K = 1){
 		$cmds = array();
-
+		$current_speeds = self::get_current_speeds();
 		$speeds = $tariff_speeds;		
-		foreach ($speeds as $s){
-			$ip = long2ip($s['ip']);
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed']*1000, $s['down_speed']* 1000, $cmds);
+		
+		if ($bonus_K != 1){
+			$hours = date('G');
+			$maxK = ($hours < 9)? 5 : 2;
+			foreach ($speeds as $ip => & $s){
+				if ($s['bonus_enabled']){
+					$s['up_speed'] = min( 100000000 
+						, min($s['up_speed'] * $maxK
+							, max($s['up_speed'], @ $current_speeds[$ip]['up'] * $bonus_K)
+						)
+					);
+					$s['down_speed'] = min( 100000000 
+						, min($s['down_speed'] * $maxK
+							, max($s['down_speed'], @ $current_speeds[$ip]['down'] * $bonus_K)
+						)
+					);
+				}
+			}
 		}
+
+		// todo: overrides here
+
+		$curr_ips = array_keys($current_speeds);
+		$needed_ips = array_keys($speeds);
+
+		$to_add = array_diff($needed_ips, $curr_ips);
+		$to_check = array_intersect($curr_ips, $needed_ips);
+		$to_delete = array_diff($curr_ips, $needed_ips);
+
+
+		foreach ($to_add as $ip){
+			$s = $speeds[$ip];
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+		}
+
+		foreach ($to_check as $ip){
+			$up_diff = abs($current_speeds[$ip]['up'] - $s[$ip]['up_speed']);
+			$down_diff = abs($current_speeds[$ip]['down'] - $s[$ip]['down_speed']);
+
+			if (($up_diff > 1000)
+				or ($down_diff > 1000)
+			){
+				Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+			}
+		}
+
+		
+
+		foreach ($speeds as $s){
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+		}
+
 		$str = '';
 		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
 		foreach ($cmds as $c){
