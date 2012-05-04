@@ -345,7 +345,9 @@ class shaper {
 	static function set_speeds($tariff_speeds, $bonus_K = 1){
 		$cmds = array();
 		$current_speeds = self::get_current_speeds();
-		$speeds = $tariff_speeds;		
+		$speeds = $tariff_speeds;	
+
+		// Пересчет бонусов
 		
 		if ($bonus_K != 1){
 			$hours = date('G');
@@ -368,6 +370,8 @@ class shaper {
 
 		// todo: overrides here
 
+		// Синхронизация тарифны+бонусы+вручную с шейпером
+
 		$curr_ips = array_keys($current_speeds);
 		$needed_ips = array_keys($speeds);
 
@@ -375,7 +379,7 @@ class shaper {
 		$to_check = array_intersect($curr_ips, $needed_ips);
 		$to_delete = array_diff($curr_ips, $needed_ips);
 
-
+		// Дгобавление правил
 		foreach ($to_add as $ip){
 			$s = $speeds[$ip];
 			$range = Network::range_by_ip($ip);
@@ -386,10 +390,11 @@ class shaper {
 			}
 		}
 
+		// Изменения правил
 		foreach ($to_check as $ip){
 			$s = $speeds[$ip];
-			$up_diff = abs($current_speeds[$ip]['up'] - $s[$ip]['up_speed'] );
-			$down_diff = abs($current_speeds[$ip]['down'] - $s[$ip]['down_speed']);
+			$up_diff = abs($current_speeds[$ip]['up'] - $s['up_speed'] );
+			$down_diff = abs($current_speeds[$ip]['down'] - $s['down_speed']);
 
 			if (($up_diff > 1000)
 				or ($down_diff > 1000)
@@ -399,11 +404,12 @@ class shaper {
 		}
 
 		
-
+		//  Удаление правил
 		foreach ($speeds as $s){
 			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
 		}
 
+		// Выполнение на шейпере
 		$str = '';
 		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
 		foreach ($cmds as $c){
