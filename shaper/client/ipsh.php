@@ -367,7 +367,12 @@ class shaper {
 
 		foreach ($to_add as $ip){
 			$s = $speeds[$ip];
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+			$range = Network::range_by_ip($ip);
+			if ($range){
+				$range->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+			}else{
+				throw new Exception('Unknown range ip : '.$ip);
+			}
 		}
 
 		foreach ($to_check as $ip){
