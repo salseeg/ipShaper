@@ -458,14 +458,14 @@ class shaper {
 		
 		// myself
 		Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000000, 10000000, $cmds);
-		Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000000, 10000000,$cmds);
+		//Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000000, 10000000,$cmds);
 
 		// servers
 		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000000, 10000000, $cmds);
 		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000000, 10000000, $cmds);
 		
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 route fromif ".ipv4ShaperRangeCalc::$downlink_iface." police mtu 1 action drop";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 route fromif ".ipv4ShaperRangeCalc::$uplink_iface." police mtu 1 action drop";
 
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
