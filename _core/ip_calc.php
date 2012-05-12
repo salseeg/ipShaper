@@ -32,8 +32,8 @@ class ipv4RangeCalc {
 	function get_gate_ip(){
 		return long2ip($this->ip_l + 1);
 	}
-	function get_abons_ips(array & $ips = false){
-		if ($ips !== false){
+	function get_abons_ips(array & $ips = null){
+		if ($ips !== null){
 			foreach(range($this->ip_l + 2, $this->ip_l + $this->amount - 2) as $ipl) {
 				$ips[] = long2ip($ipl);
 			} 
