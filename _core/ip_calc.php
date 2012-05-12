@@ -32,8 +32,14 @@ class ipv4RangeCalc {
 	function get_gate_ip(){
 		return long2ip($this->ip_l + 1);
 	}
-	function get_abons_ips(){
-		return array_map("long2ip", range($this->ip_l + 2, $this->ip_l + $this->amount - 2));
+	function get_abons_ips(array & $ips = false){
+		if ($ips !== false){
+			foreach(range($this->ip_l + 2, $this->ip_l + $this->amount - 2) as $ipl) {
+				$ips[] = long2ip($ipl);
+			} 
+		}else{
+			return array_map("long2ip", range($this->ip_l + 2, $this->ip_l + $this->amount - 2));
+		}
 	}
 	function is_ip_in($ip){
 		$ipl = ip2long($ip);
