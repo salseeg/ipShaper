@@ -7,6 +7,24 @@ require_once dirname(dirname(dirname(__FILE__))).'/_core/config.php';
 //ipv4ShaperRangeCalc::$downlink_iface = 'lo:1';
 
 
+class conf {
+	static $servers = array();
+	static $sources = array();
+}
+
+
+conf::$servers['89.185.8.30'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
+conf::$servers['89.185.8.31'] = array('up' => 10*1000*1000, 'down' => 10*1000*1000);
+
+conf::$sources['abons'] = 'http://89.185.8.31/shaper/ips_tariffs.php?php';
+conf::$sources['tariffs'] = 'http://89.185.8.31/shaper/get_tariffs.php?php';
+
+
+
+
+
+
+
 
 class users_db {
 	/**
@@ -93,7 +111,7 @@ class users_db {
 		return $ret;
 	}
 	function sync_abons(){
-		$main_abons = unserialize(file_get_contents('http://89.185.8.31/shaper/ips_tariffs.php?php'));
+		$main_abons = unserialize(file_get_contents(conf::$sources['abons']));
 		$main_abons_count = count($main_abons);
 
 		$my_abons = $this->query_array('select * from abons');
@@ -158,7 +176,7 @@ class users_db {
 		
 	}
 	function sync_tariffs(){
-		$main_tariffs = unserialize(file_get_contents('http://89.185.8.31/shaper/get_tariffs.php?php'));
+		$main_tariffs = unserialize(file_get_contents(conf::$sources['tariffs']));
 		$main_tariffs_count = count($main_tariffs);
 
 		$tariffs = $this->query_array('select * from tariffs');
@@ -294,7 +312,9 @@ class users_db {
 	
 }
 
-
+/**
+ *  интерфейс работы с шейпером и таблицами(ipset) фаервола
+ */
 class shaper {
 	static function get_current_speed_by_ip($ip){
 		$range = Network::range_by_ip($ip);
@@ -434,40 +454,13 @@ class shaper {
 			$r->make_shaper_init_rules($cmds);
 		}
 
-		/*$my_uplink_ip = '';
-		$my_downlink_ip = '';
-
-		$c = "ip a show  dev ".ipv4ShaperRangeCalc::$downlink_iface." | grep 'inet ' | head -n 1";
-		$r = trim(`$c`);
-		//print_r ($r);
-		$p = explode(' ', $r);
-		$r = $p[1];
-		//print_r ($r);
-		$p = explode('/', $r);
-		$my_downlink_ip = $p[0];
-
-		$c = "ip a show  dev ".ipv4ShaperRangeCalc::$uplink_iface." | grep 'inet ' | head -n 1";
-		$r = trim(`$c`);
-		//print_r ($r);
-		$p = explode(' ', $r);
-		$r = $p[1];
-		//print_r ($r);
-		$p = explode('/', $r);
-		$my_uplink_ip = $p[0];
-		 *
-		 */
-
-		
-		// myself
-		//Network::range_by_ip($my_downlink_ip)->make_shaper_speed_rules($my_downlink_ip, 10000000, 10000000, $cmds);
-		//Network::range_by_ip($my_uplink_ip)->make_shaper_speed_rules($my_uplink_ip, 10000000, 10000000,$cmds);
 
 		// servers
-		Network::range_by_ip('89.185.8.30')->make_shaper_speed_rules('89.185.8.30', 10000000, 10000000, $cmds);
-		Network::range_by_ip('89.185.8.31')->make_shaper_speed_rules('89.185.8.31', 10000000, 10000000, $cmds);
-		
+		foreach (conf::$servers as $ip => $speed){
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $speed['up'], $speed['down'], $cmds);
+		}	
 
-		// my own trafic (marked on output) todo
+		// my own trafic (marked on output) 
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
 		
@@ -527,16 +520,26 @@ class ips {
 		print "		\n";
 		print "	action:	\n";
 		print "		help	- 	\n";
-		print "		start	-  \n";
-		print "		stop	-  \n";
+		print "		start	- запуск шейпера, настройка правил, синхронизация с базой  \n";
+		print "		stop	- остановка шейпера, удаление правил \n";
 		print "		sync_speed\n";
-		print "			- \n";
+		print "			- синхронизация cкоростей абонентов с базой и бонусным коэфициентом \n";
 		print "		sync_tariffs\n";
-		print "			- \n";
+		print "			- синхронизация тарифов с базой\n";
+		print "		show [ip]\n";
+		print "			- показать текущие скорости абонентов, или абонента при указанитт ip\n";
+		print "		override [ip down_speed up_speed hours]\n";
+		print "			- принудительно устанавливает для ip скорость down_speed/up_speed кбит/с \n";
+		print "			  на hours часов. При отсутсвии аргументовот ображает текущие\n";
+		print "			   принудительно установленные скорости.\n";
+		print "		unoverride ip\n";
+		print "			- удаляет принудительно установленную скорость\n";
+		print "		cleanup_overrides\n";
+		print "			- удаляет закончившиеся принудительно установленные скорости\n";
 		print "	Supposed crons	\n";
-		print "		30 3 * * *  ipsh sync_tariffs\n";
-		print "		\n";
-		print "		\n";
+		print "		30 3 * * *	ipsh sync_tariffs\n";
+		print "		*/3 * * * *	ipsh sync_speed\n";
+		print "		50 */2 * * *	ipsh cleanup_overrides\n";
 		print "		\n";
 		print "		\n";
 			
@@ -577,8 +580,6 @@ class ips {
 	function override(){}
 	function unoverride(){}
 	function cleanup_overrides(){}
-	function sync_db(){
-	}
 	function sync_tariffs(){
 		users_db::init();
 		users_db::$db->sync_tariffs();
