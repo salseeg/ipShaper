@@ -25,7 +25,9 @@ conf::$sources['tariffs'] = 'http://89.185.8.31/shaper/get_tariffs.php?php';
 
 
 
-
+/**
+ * 
+ */
 class users_db {
 	/**
 	 *
