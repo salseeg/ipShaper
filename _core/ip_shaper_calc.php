@@ -122,7 +122,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		
 		// uplink
 		$rules[] = self::tc.' class replace dev '.self::$uplink_iface
-			.' parent 1: classid 1:'.dechex($class).' htb rate '.($up_speed? ($up_speed.'kbit ') : '1kbit ').self::quantum
+			.' parent 1: classid 1:'.dechex($class).' htb rate '.($up_speed? ($up_speed.'bit ') : '1kbit ').self::quantum
 		;
 		$rules[] = self::tc.' qdisc replace dev '.self::$uplink_iface
 			.' parent 1:'.dechex($class).' handle '.dechex($class).':0 '.self::leaf_disc 
@@ -136,7 +136,7 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 
 		// downlink
 		$rules[] = self::tc.' class replace dev '.self::$downlink_iface
-			.' parent 1: classid 1:'.dechex($class).' htb rate '.($down_speed?($down_speed.'kbit '):'1kbit ').self::quantum
+			.' parent 1: classid 1:'.dechex($class).' htb rate '.($down_speed?($down_speed.'bit '):'1kbit ').self::quantum
 		;
 		$rules[] = self::tc.' qdisc replace dev '.self::$downlink_iface
 			.' parent 1:'.dechex($class).' handle '.dechex($class).':0 '.self::leaf_disc 
