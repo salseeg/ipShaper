@@ -51,6 +51,11 @@ class users_db {
 		}
 		
 	}
+	/**
+	 *	Проверяет пустая ли база
+	 * 
+	 * @return bool  
+	 */
 	function is_empty(){
 		$res = @ $this->_db->querySingle("select count(*) from abons");
 		if ($res === false){
@@ -63,6 +68,9 @@ class users_db {
 
 		return false;
 	}
+	/**
+	 * 	Создает структуру базы
+	 */
 	function create(){
 		$this->_db->exec(
 			"create table if not exists 
@@ -112,6 +120,9 @@ class users_db {
 		}
 		return $ret;
 	}
+	/**
+	 * 
+	 */
 	function sync_abons(){
 		$main_abons = unserialize(file_get_contents(conf::$sources['abons']));
 		$main_abons_count = count($main_abons);
@@ -177,6 +188,9 @@ class users_db {
 		}
 		
 	}
+	/**
+	 * 
+	 */
 	function sync_tariffs(){
 		$main_tariffs = unserialize(file_get_contents(conf::$sources['tariffs']));
 		$main_tariffs_count = count($main_tariffs);
@@ -305,6 +319,9 @@ class users_db {
 		$keys = array_map('long2ip', $keys);
 		return array_combine($keys, array_values($speeds));
 	}
+	/**
+	 * 
+	 */
 	static function init(){
 		if (!self::$db){
 			self::$db = new users_db('users.db');
@@ -401,7 +418,7 @@ class shaper {
 		$to_check = array_intersect($curr_ips, $needed_ips);
 		$to_delete = array_diff($curr_ips, $needed_ips);
 
-		// Дгобавление правил
+		// Добавление правил
 		foreach ($to_add as $ip){
 			$s = $speeds[$ip];
 			$range = Network::range_by_ip($ip);
@@ -468,8 +485,8 @@ class shaper {
 		
 		
 		// droping rest
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
