@@ -459,7 +459,7 @@ class shaper {
 		file_put_contents($fn, $str);
 		$cmd = "tc -b $fn";
 		`$cmd`;
-		unlink($fn);
+		//unlink($fn);
 	}
 
 	static function init(){
