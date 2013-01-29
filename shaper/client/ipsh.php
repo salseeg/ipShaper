@@ -547,6 +547,7 @@ class ips {
 		$action = array_shift($args);
 		$methods = get_class_methods($this);
 		if (in_array($action, $methods)){
+			Network::init_shaper_structures();
 			$this->$action($args);
 		}else{
 			$this->help();
@@ -586,7 +587,6 @@ class ips {
 	 */
 	function start(){
 		users_db::init();
-		Network::init_shaper_structures();
 
 		$speeds = users_db::$db->get_speeds();
 
