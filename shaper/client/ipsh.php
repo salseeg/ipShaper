@@ -10,11 +10,22 @@ require_once dirname(dirname(dirname(__FILE__))).'/_core/config.php';
 class conf {
 	static $servers = array();
 	static $sources = array();
+	static $bypass = array(
+	    	'up' => array()
+	    	, 'down' => array()
+	);
 }
 
 
 conf::$servers['89.185.8.30'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
 conf::$servers['89.185.8.31'] = array('up' => 10*1000*1000, 'down' => 10*1000*1000);
+
+conf::$bypass['up'][] = '93.185.219.128/26';
+conf::$bypass['up'][] = '89.185.8.74/32';
+conf::$bypass['down'][] = '89.185.8.54/32';
+conf::$bypass['down'][] = '224.0.0.5/32';
+conf::$bypass['down'][] = '224.0.0.6/32';
+
 
 conf::$sources['abons'] = 'http://89.185.8.31/shaper/ips_tariffs.php?php';
 conf::$sources['tariffs'] = 'http://89.185.8.31/shaper/get_tariffs.php?php';
@@ -479,14 +490,27 @@ class shaper {
 			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $speed['up'], $speed['down'], $cmds);
 		}	
 
-		// my own trafic (marked on output) 
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
-		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
+		// my own trafic (marked on output) not works
+		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
+		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
 		
+		$cmds[] =  ipv4ShaperRangeCalc::tc." class replace dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1: classid 1:8 htb rate 500Mbit ".ipv4ShaperRangeCalc::quantum;
+		$cmds[] =  ipv4ShaperRangeCalc::tc." qsisc replace dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
+		$cmds[] =  ipv4ShaperRangeCalc::tc." class replace dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1: classid 1:8 htb rate 500Mbit ".ipv4ShaperRangeCalc::quantum;
+		$cmds[] =  ipv4ShaperRangeCalc::tc." qsisc replace dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
+		
+		foreach (conf::$bypass['up'] as $ip){
+			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface
+				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
+		}
+			foreach (conf::$bypass['down'] as $ip){
+			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface
+				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
+		}
 		
 		// droping rest
-		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
-		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
+		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 
 		$speeds = users_db::$db->get_speeds();
 		foreach ($speeds as $s){
