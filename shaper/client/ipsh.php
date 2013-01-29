@@ -346,6 +346,20 @@ class users_db {
  *  интерфейс работы с шейпером и таблицами(ipset) фаервола
  */
 class shaper {
+	static function exec_batch($cmds){
+		// Выполнение на шейпере
+		$str = '';
+		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
+		foreach ($cmds as $c){
+			//print "$c \n";
+			$str .= substr($c,$offset)."\n";
+		}
+		$fn = tempnam('/tmp/', 'ipsh_');
+		file_put_contents($fn, $str);
+		$cmd = "tc -b $fn";
+		`$cmd`;
+		unlink($fn);	
+	}
 	static function get_current_speed_by_ip($ip){
 		$range = Network::range_by_ip($ip);
 		$class = $range->class_offset + ip2long($ip) - $range->ip_l;
@@ -455,22 +469,12 @@ class shaper {
 
 		
 		//  Удаление правил
-		foreach ($speeds as $s){
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+		foreach ($to_delete as $ip){
+			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, 0, 64000, $cmds);
 		}
 
-		// Выполнение на шейпере
-		$str = '';
-		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
-		foreach ($cmds as $c){
-			//print "$c \n";
-			$str .= substr($c,$offset)."\n";
-		}
-		$fn = tempnam('/tmp/', 'ipsh_');
-		file_put_contents($fn, $str);
-		$cmd = "tc -b $fn";
-		`$cmd`;
-		unlink($fn);
+		self::exec_batch($cmds);
+
 	}
 
 	static function init(){
@@ -512,23 +516,13 @@ class shaper {
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 		$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 30 u32 match u32 0 0 at 0 police mtu 1 action drop";
 
-		$speeds = users_db::$db->get_speeds();
-		foreach ($speeds as $s){
-			$ip = long2ip($s['ip']);
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
-		}
-		$str = '';
-		$offset = strlen(ipv4ShaperRangeCalc::tc) + 1;
-		foreach ($cmds as $c){
-			//print "$c \n";
-			$str .= substr($c,$offset)."\n";
-		}
-		$fn = tempnam('/tmp/', 'ipsh_');
-		file_put_contents($fn, $str);
-		$cmd = "tc -b $fn";
-		`$cmd`;
-		unlink($fn);
+		//$speeds = users_db::$db->get_speeds();
+		//foreach ($speeds as $s){
+		//	$ip = long2ip($s['ip']);
+		//	Network::range_by_ip($ip)->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
+		//}
 
+		self::exec_batch($cmds);
 
 		
 	}
@@ -615,6 +609,8 @@ class ips {
 		users_db::$db->sync_abons();
 
 		$speeds = users_db::$db->get_speeds();
+
+		shaper::set_speeds($speeds);
 
 	}
 	/**
