@@ -470,7 +470,10 @@ class shaper {
 		
 		//  Удаление правил
 		foreach ($to_delete as $ip){
-			Network::range_by_ip($ip)->make_shaper_speed_rules($ip, 0, 64000, $cmds);
+			$range = Network::range_by_ip($ip);
+			if ($range){
+				$range->make_shaper_speed_rules($ip, 0, 64000, $cmds);
+			}
 		}
 
 		self::exec_batch($cmds);
