@@ -38,6 +38,7 @@ class Network {
 				break;
 			}	
 		}
+		return false;
 	}
 	/**
 	 * Возвращает ИП адресс для класса
