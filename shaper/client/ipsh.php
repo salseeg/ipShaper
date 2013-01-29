@@ -360,6 +360,8 @@ class shaper {
 		$res = trim(`$cmd 2>&1`);
 		if (!$res){
 			unlink($fn);	
+		}else{
+			print $res."\n";
 		}
 	}
 	static function get_current_speed_by_ip($ip){
