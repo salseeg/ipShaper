@@ -495,9 +495,9 @@ class shaper {
 		//$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:0 protocol ip pref 25 handle 1 fw  police rate 30000000 burst 1500 action ok";
 		
 		$cmds[] =  ipv4ShaperRangeCalc::tc." class replace dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1: classid 1:8 htb rate 500Mbit ".ipv4ShaperRangeCalc::quantum;
-		$cmds[] =  ipv4ShaperRangeCalc::tc." qsisc replace dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
+		$cmds[] =  ipv4ShaperRangeCalc::tc." qdisc replace dev ".ipv4ShaperRangeCalc::$uplink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
 		$cmds[] =  ipv4ShaperRangeCalc::tc." class replace dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1: classid 1:8 htb rate 500Mbit ".ipv4ShaperRangeCalc::quantum;
-		$cmds[] =  ipv4ShaperRangeCalc::tc." qsisc replace dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
+		$cmds[] =  ipv4ShaperRangeCalc::tc." qdisc replace dev ".ipv4ShaperRangeCalc::$downlink_iface." parent 1:8 handle 8: ".ipv4ShaperRangeCalc::leaf_disc;
 		
 		foreach (conf::$bypass['up'] as $ip){
 			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface
