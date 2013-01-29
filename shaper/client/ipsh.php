@@ -357,8 +357,10 @@ class shaper {
 		$fn = tempnam('/tmp/', 'ipsh_');
 		file_put_contents($fn, $str);
 		$cmd = "tc -b $fn";
-		`$cmd`;
-		unlink($fn);	
+		$res = trim(`$cmd 2>&1`);
+		if (!$res){
+			unlink($fn);	
+		}
 	}
 	static function get_current_speed_by_ip($ip){
 		$range = Network::range_by_ip($ip);
