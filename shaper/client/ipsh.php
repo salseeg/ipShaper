@@ -354,7 +354,7 @@ class shaper {
 		}
 		$fn = tempnam('/tmp/', 'ipsh_');
 		file_put_contents($fn, $str);
-		$cmd = "tc -b $fn";
+		$cmd = ipv4ShaperRangeCalc::tc." -b $fn";
 		$res = trim(`$cmd 2>&1`);
 		if (!$res){
 			unlink($fn);	
