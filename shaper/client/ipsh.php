@@ -141,10 +141,8 @@ class users_db {
 		$my_abons = $this->query_array('select * from abons');
 		$my_abons_count = count($my_abons);
 		if (
-			!$main_abons_count
-			or
-			($my_abons_count < $main_abons_count)
-			or
+			$main_abons_count
+			and 
 			($my_abons_count / $main_abons_count < 2)
 		){
 			$my = array();
@@ -316,7 +314,7 @@ class users_db {
 			" select
 				a.ip
 				, ifnull(t.up_speed, 0) as up_speed
-				, ifnull(t.down_speed, 1) as down_speed
+				, ifnull(t.down_speed, 10000) as down_speed
 				, ifnull(t.bonus_enabled, 0) as bonus_enabled
 				, ifnull(t.always_enabled, 0) as always_enabled
 			from
