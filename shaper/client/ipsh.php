@@ -3,8 +3,8 @@
 
 require_once dirname(dirname(dirname(__FILE__))).'/_core/config.php';
 
-//ipv4ShaperRangeCalc::$uplink_iface = 'lo:0';
-//ipv4ShaperRangeCalc::$downlink_iface = 'lo:1';
+// ipv4ShaperRangeCalc::$uplink_iface = 'test1';
+// ipv4ShaperRangeCalc::$downlink_iface = 'test2';
 
 
 class conf {
@@ -114,6 +114,7 @@ class users_db {
 				ip integer primary_key
 				, up_speed integer
 				, down_speed integer
+				, expires integer
 			);
 			
 			"
@@ -131,6 +132,39 @@ class users_db {
 		}
 		return $ret;
 	}
+	/**
+	 *
+	 * @return array [ip] => array( ip => long, up_speed => bits, down_speed => bits, expires => unixtime )
+	 */
+	function get_overrides(){
+		$overrides = $this->query_array(
+			" select
+				*
+			from
+				overrides
+			"
+			, 'ip'
+		);
+		$keys = array_keys($overrides);
+		$keys = array_map('long2ip', $keys);
+		return array_combine($keys, array_values($overrides));
+	
+	}
+	function set_override($ip, $up, $down, $expires){
+		$ip = ip2long($ip);
+		$this->_db->exec("insert into overrides(ip, up_speed, down_speed, expires) values($ip,$up,$down,$expires)");
+	}
+	function delete_override($ip){
+		$ip = ip2long($ip);
+		$this->_db->exec("delete from overrides where ip = $ip ");
+	}
+	function clean_expired_overrides($time = false){
+		if (!$time){
+			$time = time();
+		}
+		$this->_db->exec("delete from overrides where expires < $time ");
+	}
+	
 	/**
 	 * 
 	 */
@@ -435,6 +469,11 @@ class shaper {
 		}
 
 		// todo: overrides here
+		$overrides = users_db::$db->get_overrides();
+		foreach ($overrides as $ip => $o){
+			$speeds[$ip]['up_speed'] = $o['up_speed'];
+			$speeds[$ip]['down_speed'] = $o['down_speed'];
+		}
 
 		// Синхронизация тарифны+бонусы+вручную с шейпером
 
@@ -621,9 +660,47 @@ class ips {
 	/**
 	 * 
 	 */
-	function override(){}
-	function unoverride(){}
-	function cleanup_overrides(){}
+	function override($args){
+		users_db::init();
+		if ($args and count($args) == 4){
+			$ip = $args[0];
+			$down_speed = $args[1] * 1000;
+			$up_speed = $args[2] * 1000;
+			$time = time() + $args[3] * 3600;
+			users_db::$db->set_override($ip, $up_speed, $down_speed, $time);
+			$this->sync_speed();
+		}else{
+			$overrides = users_db::$db->get_overrides();
+
+			foreach ($overrides as $ip => $s){
+				$up = strtr($s['up_speed'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
+				$down = strtr($s['down_speed'].' ', array('000000 ' => ' Mbit', '000 ' => ' Kbit', ' ' => ' bit'));
+				$time = date("Y-m-d H:i:s", $s['expires']);
+
+				print "$ip\t = \t $down \t $up \t$time\n";
+			}
+			if (!count($overrides)){
+				print "No overrides found\n";
+			}
+
+		}
+		
+	}
+	function unoverride($args){
+		if ($args and count($args) == 1){
+			users_db::init();
+			$ip = $args[0];
+			users_db::$db->delete_override($ip);
+			$this->sync_speed();
+		}else{
+			$this->help();
+		}
+	}
+	function cleanup_overrides(){
+		users_db::init();
+		users_db::$db->clean_expired_overrides();
+		$this->sync_speed();
+	}
 	function sync_tariffs(){
 		users_db::init();
 		users_db::$db->sync_tariffs();
