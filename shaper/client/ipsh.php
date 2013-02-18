@@ -25,6 +25,7 @@ conf::$bypass['up'][] = '89.185.8.74/32';
 conf::$bypass['down'][] = '89.185.8.54/32';
 conf::$bypass['down'][] = '224.0.0.5/32';
 conf::$bypass['down'][] = '224.0.0.6/32';
+conf::$bypass['down'][] = '172.17.0.0/16';
 
 
 conf::$sources['abons'] = 'http://89.185.8.31/shaper/ips_tariffs.php?php';
