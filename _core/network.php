@@ -67,7 +67,7 @@ Network::$ranges['93.185.218.0/23'] = new ipv4RangeCalc('93.185.218.0',23);
 Network::$ranges['93.185.220.0/23'] = new ipv4RangeCalc('93.185.220.0',23);
 Network::$ranges['5.56.24.0/23'] = new ipv4RangeCalc('5.56.24.0',23);
 Network::$ranges['5.56.26.0/23'] = new ipv4RangeCalc('5.56.26.0',23);
-
+Network::$ranges['5.56.28.0/23'] = new ipv4RangeCalc('5.56.28.0',23);
 
 
 ?>
