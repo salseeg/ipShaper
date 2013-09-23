@@ -23,7 +23,7 @@ conf::$servers['89.185.8.44'] = array('up' => 30*1000*1000, 'down' => 30*1000*10
 
 conf::$bypass['up'][] = '93.185.219.128/26';	//wifi abon
 conf::$bypass['up'][] = '89.185.8.74/32';	//server output
-conf::$bypass['down'][] = '89.185.8.54/32';	//server output
+conf::$bypass['down'][] = '89.185.8.0/26';	//server output
 conf::$bypass['down'][] = '224.0.0.5/32';	//ospf
 conf::$bypass['down'][] = '224.0.0.6/32';	//ospf
 conf::$bypass['down'][] = '172.17.0.0/16';	//access vlan
