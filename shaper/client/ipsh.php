@@ -21,12 +21,18 @@ conf::$servers['89.185.8.30'] = array('up' => 20*1000*1000, 'down' => 10*1000*10
 conf::$servers['89.185.8.31'] = array('up' => 10*1000*1000, 'down' => 10*1000*1000);
 conf::$servers['89.185.8.44'] = array('up' => 30*1000*1000, 'down' => 30*1000*1000);
 
-conf::$bypass['up'][] = '93.185.219.128/26';
-conf::$bypass['up'][] = '89.185.8.74/32';
-conf::$bypass['down'][] = '89.185.8.54/32';
-conf::$bypass['down'][] = '224.0.0.5/32';
-conf::$bypass['down'][] = '224.0.0.6/32';
-conf::$bypass['down'][] = '172.17.0.0/16';
+conf::$bypass['up'][] = '93.185.219.128/26';	//wifi abon
+conf::$bypass['up'][] = '89.185.8.74/32';	//server output
+conf::$bypass['down'][] = '89.185.8.54/32';	//server output
+conf::$bypass['down'][] = '224.0.0.5/32';	//ospf
+conf::$bypass['down'][] = '224.0.0.6/32';	//ospf
+conf::$bypass['down'][] = '172.17.0.0/16';	//access vlan
+conf::$bypass['down'][] = '5.56.24.125/32';	//kassa
+conf::$bypass['down'][] = '5.56.26.200/32';	//kassa
+conf::$bypass['down'][] = '89.185.12.249/32';	//kassa
+conf::$bypass['down'][] = '93.185.217.100/32';	//kassa
+conf::$bypass['down'][] = '93.185.219.6/32';	//kassa
+
 
 
 conf::$sources['abons'] = 'http://89.185.8.31/shaper/ips_tariffs.php?php';
