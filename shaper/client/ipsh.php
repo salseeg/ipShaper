@@ -17,6 +17,10 @@ class conf {
 }
 
 
+conf::$servers['89.185.8.51'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
+conf::$servers['89.185.8.52'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
+conf::$servers['89.185.8.53'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
+
 conf::$servers['89.185.8.30'] = array('up' => 20*1000*1000, 'down' => 10*1000*1000);
 conf::$servers['89.185.8.31'] = array('up' => 10*1000*1000, 'down' => 10*1000*1000);
 conf::$servers['89.185.8.44'] = array('up' => 30*1000*1000, 'down' => 30*1000*1000);
@@ -560,7 +564,7 @@ class shaper {
 			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface
 				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
 		}
-			foreach (conf::$bypass['down'] as $ip){
+		foreach (conf::$bypass['down'] as $ip){
 			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface
 				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
 		}
