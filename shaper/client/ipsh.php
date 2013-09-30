@@ -557,7 +557,7 @@ class shaper {
 			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$uplink_iface
 				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
 		}
-			foreach (conf::$bypass['down'] as $ip){
+		foreach (conf::$bypass['down'] as $ip){
 			$cmds[] =  ipv4ShaperRangeCalc::tc." filter add dev ".ipv4ShaperRangeCalc::$downlink_iface
 				." parent 1:0 protocol ip pref 25 u32 match ip src $ip flowid 1:8";
 		}
