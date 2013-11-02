@@ -504,7 +504,7 @@ class shaper {
 			if ($range){
 				$range->make_shaper_speed_rules($ip, $s['up_speed'], $s['down_speed'], $cmds);
 			}else{
-				throw new Exception('Unknown range ip : '.$ip);
+				// throw new Exception('Unknown range ip : '.$ip);
 			}
 		}
 
