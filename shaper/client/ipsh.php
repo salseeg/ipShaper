@@ -34,6 +34,7 @@ conf::$bypass['down'][] = '172.17.0.0/16';	//access vlan
 conf::$bypass['down'][] = '5.56.24.125/32';	//kassa
 conf::$bypass['down'][] = '5.56.26.200/32';	//kassa
 conf::$bypass['down'][] = '89.185.12.249/32';	//kassa
+conf::$bypass['down'][] = '89.185.23.232/32';	//billing
 conf::$bypass['down'][] = '93.185.217.100/32';	//kassa
 conf::$bypass['down'][] = '93.185.219.6/32';	//kassa
 conf::$bypass['down'][] = '89.185.8.51/32';
