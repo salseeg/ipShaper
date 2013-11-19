@@ -488,6 +488,10 @@ class shaper {
 			$speeds[$ip]['up_speed'] = $o['up_speed'];
 			$speeds[$ip]['down_speed'] = $o['down_speed'];
 		}
+		foreach (conf::$servers as $ip => $s){
+			$speeds[$ip]['up_speed'] = $s['up'];
+			$speeds[$ip]['down_speed'] = $s['down'];
+		}
 
 		// Синхронизация тарифны+бонусы+вручную с шейпером
 
