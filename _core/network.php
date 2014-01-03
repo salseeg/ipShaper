@@ -34,9 +34,9 @@ class Network {
 	static function range_by_ip($ip){
 		foreach (static::$ranges as & $r){
 			if ($r->is_ip_in($ip)){
+				print_r($r);
 				return $r;
-				break;
-			}	
+			}
 		}
 		return false;
 	}
