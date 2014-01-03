@@ -5,7 +5,7 @@ class Network {
 	static $ranges = array();
 
 	static function is_ip_in($ip){
-		foreach (self::$ranges as $r){
+		foreach (static::$ranges as $r){
 			if ($r->is_ip_in($ip)){
 				return true;
 			}
@@ -17,7 +17,7 @@ class Network {
 		$class_offset = 17;
 		$ht1_offset = 17;
 		$ht2_offset = 257;
-		foreach (self::$ranges as & $r){
+		foreach (static::$ranges as & $r){
 			$r = new ipv4ShaperRangeCalc($r->ip, $r->mask_len, $class_offset, $ht1_offset, $ht2_offset);
 			$amount = $r->amount;
 			$ht2_amount = ceil($amount / 256.0);
@@ -32,7 +32,7 @@ class Network {
 	 * @return ipv4ShaperRangeCalc 
 	 */
 	static function range_by_ip($ip){
-		foreach (self::$ranges as & $r){
+		foreach (static::$ranges as & $r){
 			if ($r->is_ip_in($ip)){
 				return $r;
 				break;
@@ -47,7 +47,7 @@ class Network {
 	 * @return string ip 
 	 */
 	static function ip_by_class($class){
-		foreach (self::$ranges as & $r){
+		foreach (static::$ranges as & $r){
 			$ip = $r->ip_by_class($class); 
 			if ($ip){
 				return long2ip($ip);
@@ -69,6 +69,7 @@ Network::$ranges['5.56.24.0/23'] = new ipv4RangeCalc('5.56.24.0',23);
 Network::$ranges['5.56.26.0/23'] = new ipv4RangeCalc('5.56.26.0',23);
 Network::$ranges['5.56.28.0/23'] = new ipv4RangeCalc('5.56.28.0',23);
 Network::$ranges['5.56.30.0/23'] = new ipv4RangeCalc('5.56.30.0',23);
+
 
 
 ?>
