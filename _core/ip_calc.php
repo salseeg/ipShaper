@@ -41,6 +41,21 @@ class ipv4RangeCalc {
 			return array_map("long2ip", range($this->ip_l + 2, $this->ip_l + $this->amount - 2));
 		}
 	}
+
+	/**
+	 * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
+	 *
+	 * @return string
+	 */
+	function get_abons_ips_as_range(){
+		$ips = $this->get_abons_ips();
+		$first_ip = array_shift($ips);
+		$last_ip = array_pop($ips);
+		return $last_ip
+			? ($first_ip." - ".$last_ip)
+			: $first_ip
+		;
+	}
 	function is_ip_in($ip){
 		$ipl = ip2long($ip);
 		return (($ipl >= $this->ip_l) and ($ipl <= ($this->ip_l + $this->amount - 1)));
