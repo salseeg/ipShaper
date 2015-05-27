@@ -37,6 +37,9 @@ conf::$servers['5.56.26.200'] = array('up' => 3*1000, 'down' => 30*1000*1000);
 conf::$servers['89.185.12.249'] = array('up' => 3*1000, 'down' => 30*1000*1000);
 conf::$servers['93.185.217.100'] = array('up' => 3*1000, 'down' => 30*1000*1000);
 conf::$servers['93.185.219.6'] = array('up' => 3*1000, 'down' => 30*1000*1000);
+conf::$servers['109.72.122.37'] = array('up' => 3*1000, 'down' => 30*1000*1000);
+
+
 
 conf::$bypass['up'][] = '93.185.219.128/26';	//wifi abon
 //conf::$bypass['up'][] = '89.185.8.74/32';	//server output
@@ -44,7 +47,8 @@ conf::$bypass['up'][] = '93.185.219.128/26';	//wifi abon
 //conf::$bypass['down'][] = '224.0.0.5/32';	//ospf
 //conf::$bypass['down'][] = '224.0.0.6/32';	//ospf
 conf::$bypass['down'][] = '172.17.0.0/16';	//access vlan
-
+conf::$bypass['down'][] = '109.72.122.37/32';	//site
+conf::$bypass['up'][] = '109.72.122.37/32';
 
 
 conf::$sources['abons'] = 'http://89.185.8.31/shaper/ips_tariffs.php?php';
