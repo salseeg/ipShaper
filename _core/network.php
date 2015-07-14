@@ -61,14 +61,9 @@ class Network {
 
 Network::$ranges['89.185.8.0/21'] = new ipv4RangeCalc('89.185.8.0',21);
 Network::$ranges['89.185.16.0/21'] = new ipv4RangeCalc('89.185.16.0',21);
-Network::$ranges['93.185.222.0/23'] = new ipv4RangeCalc('93.185.222.0',23);
-Network::$ranges['93.185.216.0/23'] = new ipv4RangeCalc('93.185.216.0',23);
-Network::$ranges['93.185.218.0/23'] = new ipv4RangeCalc('93.185.218.0',23);
-Network::$ranges['93.185.220.0/23'] = new ipv4RangeCalc('93.185.220.0',23);
-Network::$ranges['5.56.24.0/23'] = new ipv4RangeCalc('5.56.24.0',23);
-Network::$ranges['5.56.26.0/23'] = new ipv4RangeCalc('5.56.26.0',23);
-Network::$ranges['5.56.28.0/23'] = new ipv4RangeCalc('5.56.28.0',23);
-Network::$ranges['5.56.30.0/23'] = new ipv4RangeCalc('5.56.30.0',23);
+Network::$ranges['93.185.216.0/21'] = new ipv4RangeCalc('93.185.216.0',21);
+Network::$ranges['5.56.24.0/21'] = new ipv4RangeCalc('5.56.24.0',21);
+Network::$ranges['185.30.202.0/23'] = new ipv4RangeCalc('185.30.202.0',23);
 
 
 
