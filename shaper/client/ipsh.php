@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once dirname(dirname(dirname(__FILE__))).'/_core/config.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/net/config.php';
 
 // ipv4ShaperRangeCalc::$uplink_iface = 'test1';
 // ipv4ShaperRangeCalc::$downlink_iface = 'test2';
