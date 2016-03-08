@@ -60,7 +60,7 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
     }
 
     function testBench(){
-        $i = 1000000; //00000;
+        $i = 10000; //00000;
 
         while ($i >0){
             $c = new ipv4RangeCalc(implode('.', [
@@ -68,7 +68,9 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
                 rand(0, 254),
                 rand(0, 254),
                 rand(0, 254),
-            ]), rand(8, 30));
+            ]), rand(20, 24));
+            $c->get_abons_ips_as_range();
+
             $i -= 1;
         }
 
