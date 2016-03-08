@@ -59,8 +59,21 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
         ], $ips);
     }
 
+    function testClientIpRange(){
+        $c = new ipv4RangeCalc('192.168.0.1/29');
+
+        $this->assertEquals('192.168.0.2 - 192.168.0.6', $c->get_abons_ips_as_range());
+        $this->assertEquals('192.168.0.2 - 192.168.0.6', $c->get_client_ips_as_range());
+
+        $c = new ipv4RangeCalc('192.168.0.1/30');
+
+        $this->assertEquals('192.168.0.2', $c->get_abons_ips_as_range());
+        $this->assertEquals('192.168.0.2', $c->get_client_ips_as_range());
+
+    }
+
     function testBench(){
-        $i = 10000; //00000;
+        $i = 100000; //00000;
 
         while ($i >0){
             $c = new ipv4RangeCalc(implode('.', [
@@ -68,8 +81,9 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
                 rand(0, 254),
                 rand(0, 254),
                 rand(0, 254),
-            ]), rand(20, 24));
-            $c->get_abons_ips_as_range();
+            ]), rand(13, 24));
+//            $c->get_abons_ips_as_range();
+            $c->get_client_ips_as_range();
 
             $i -= 1;
         }

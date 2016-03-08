@@ -109,17 +109,28 @@ class ipv4RangeCalc {
 	 * Returns IP range  as a string, like "start_IP - end_IP" or only IP in range 
 	 * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
 	 *
+     * @deprecated
 	 * @return string
 	 */
-	function get_abons_ips_as_range(){   
-		$ips = $this->get_abons_ips(); // todo: rewrite not using arrays
-		$first_ip = array_shift($ips);
-		$last_ip = array_pop($ips);
-		return $last_ip
-			? ($first_ip." - ".$last_ip)
-			: $first_ip
-		;
+	function get_abons_ips_as_range(){
+        return $this->get_client_ips_as_range();
 	}
+
+    /**
+     * Returns IP range  as a string, like "start_IP - end_IP" or only IP in range
+     * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
+     *
+     * @return string
+     */
+    function get_client_ips_as_range(){
+        $first_ip = long2ip($this->ip_l + 2); // skipping network and gate IPs
+        $last_ip = long2ip($this->ip_l + $this->amount - 2); // skipping broadcast IP
+        return $first_ip  == $last_ip
+            ? $first_ip
+            : ($first_ip." - ".$last_ip)
+        ;
+    }
+    
 	function is_ip_in($ip){
 		$ipl = ip2long($ip);
 		return (($ipl >= $this->ip_l) and ($ipl <= ($this->ip_l + $this->amount - 1)));
