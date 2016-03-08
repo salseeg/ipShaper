@@ -28,5 +28,23 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    function testCreating(){
+        $c = new ipv4RangeCalc('192.168.0.1', 25);
+
+        $this->assertAttributeEquals(25, 'mask_len', $c);
+        $this->assertAttributeEquals(128, 'amount', $c);
+        $this->assertAttributeEquals('192.168.0.1', 'ip', $c);
+        $this->assertAttributeEquals(ip2long('192.168.0.0'), 'ip_l', $c);
+    }
+    
+    function testCreatingCidr(){
+        $c = new ipv4RangeCalc('192.168.0.1/25');
+
+        $this->assertAttributeEquals(25, 'mask_len', $c);
+        $this->assertAttributeEquals(128, 'amount', $c);
+        $this->assertAttributeEquals('192.168.0.1', 'ip', $c);
+        $this->assertAttributeEquals(ip2long('192.168.0.0'), 'ip_l', $c);
+    }
+
 
 }

@@ -27,9 +27,21 @@ class ipv4RangeCalc {
      * @param string $ip  -  network base IP
      * @param int $mask_len
      */
-    function __construct($ip, $mask_len){
-        $this->init($ip, $mask_len);
+    function __construct($ip, $mask_len = 24){
+        list($ip, $cidrMaskLen) = self::parseCidr($ip);
+        $cidrMaskLen = intval($cidrMaskLen);
+
+        $this->init($ip, $cidrMaskLen ?: $mask_len);
 	}
+
+    static function parseCidr($ip){
+        $parts = explode('/', $ip, 2);
+        if (count($parts) < 2){
+            return [$ip, 0];
+        }
+        return $parts;
+
+    }
     
     protected function init($ip, $mask_len){
 		$offset = 32 - $mask_len;
