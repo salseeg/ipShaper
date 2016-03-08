@@ -48,7 +48,7 @@ class ipv4RangeCalc {
 		$this->ip = $ip;
 		$this->mask_len = $mask_len;
 		$this->ip_l = (ip2long($ip) >> $offset) << $offset ;
-		$this->amount = pow(2, 32 - $mask_len);  // todo: rewrite to shift
+		$this->amount = 1 << (32 - $mask_len);
     }
 
     /**
@@ -63,7 +63,7 @@ class ipv4RangeCalc {
      * @deprecated 
      */
 	function get_brodcast_ip(){
-        
+        return $this->get_broadcast_ip();    
     }
 	function get_broadcast_ip(){
 		return long2ip($this->ip_l + $this->amount - 1);

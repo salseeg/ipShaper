@@ -36,7 +36,7 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals('192.168.0.1', 'ip', $c);
         $this->assertAttributeEquals(ip2long('192.168.0.0'), 'ip_l', $c);
     }
-    
+
     function testCreatingCidr(){
         $c = new ipv4RangeCalc('192.168.0.1/25');
 
@@ -44,6 +44,35 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(128, 'amount', $c);
         $this->assertAttributeEquals('192.168.0.1', 'ip', $c);
         $this->assertAttributeEquals(ip2long('192.168.0.0'), 'ip_l', $c);
+    }
+
+    function testClientRange(){
+        $c = new ipv4RangeCalc('192.168.0.1/29');
+
+        $ips = $c->getClientIps();
+        $this->assertEquals([
+            '192.168.0.2',
+            '192.168.0.3',
+            '192.168.0.4',
+            '192.168.0.5',
+            '192.168.0.6',
+        ], $ips);
+    }
+
+    function testBench(){
+        $i = 1000000; //00000;
+
+        while ($i >0){
+            $c = new ipv4RangeCalc(implode('.', [
+                rand(0, 254),
+                rand(0, 254),
+                rand(0, 254),
+                rand(0, 254),
+            ]), rand(8, 30));
+            $i -= 1;
+        }
+
+
     }
 
 
