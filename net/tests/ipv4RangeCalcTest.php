@@ -49,7 +49,7 @@ class ipv4RangeCalcTest extends \PHPUnit_Framework_TestCase
     function testClientRange(){
         $c = new ipv4RangeCalc('192.168.0.1/29');
 
-        $ips = $c->getClientIps();
+        $ips = $c->get_client_ips();
         $this->assertEquals([
             '192.168.0.2',
             '192.168.0.3',

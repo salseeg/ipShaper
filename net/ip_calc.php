@@ -65,6 +65,8 @@ class ipv4RangeCalc {
 	function get_brodcast_ip(){
         return $this->get_broadcast_ip();    
     }
+
+
 	function get_broadcast_ip(){
 		return long2ip($this->ip_l + $this->amount - 1);
 	}
@@ -85,14 +87,14 @@ class ipv4RangeCalc {
      * @deprecated
      */
 	function get_abons_ips(array & $ips = null){
-        return $this->getClientIps($ips);
+        return $this->get_client_ips($ips);
     }
 
     /**
      * @param array|null $ips
      * @return array
      */
-    function getClientIps(array & $ips = null){
+    function get_client_ips(array & $ips = null){
 		if ($ips !== null){
 			foreach(range($this->ip_l + 2, $this->ip_l + $this->amount - 2) as $ipl) {
 				$ips[] = long2ip($ipl);
