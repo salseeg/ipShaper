@@ -20,8 +20,7 @@ class ipv4RangeCalc {
     protected $ip_l;
     protected $mask_len;
     protected $amount;
-    
-    
+
     /**
      *
      * @param string $ip  -  network base IP
@@ -34,15 +33,6 @@ class ipv4RangeCalc {
         $this->init($ip, $cidrMaskLen ?: $mask_len);
 	}
 
-    static function parseCidr($ip){
-        $parts = explode('/', $ip, 2);
-        if (count($parts) < 2){
-            return [$ip, 0];
-        }
-        return $parts;
-
-    }
-    
     protected function init($ip, $mask_len){
 		$offset = 32 - $mask_len;
 		$this->ip = $ip;
@@ -59,36 +49,21 @@ class ipv4RangeCalc {
 		return long2ip($this->ip_l);
 	}
 
-    /**
-     * @deprecated 
-     */
-	function get_brodcast_ip(){
-        return $this->get_broadcast_ip();    
-    }
 
 
 	function get_broadcast_ip(){
 		return long2ip($this->ip_l + $this->amount - 1);
 	}
 
-
 	function get_mask(){
 		$fullMask = ip2long('255.255.255.255');
 		$offset = 32 - $this->mask_len;
 		return long2ip(($fullMask >> $offset) << $offset );
 	}
+
 	function get_gate_ip(){
 		return long2ip($this->ip_l + 1);
 	}
-
-    /**
-     * @param array|null $ips
-     * @return array
-     * @deprecated
-     */
-	function get_abons_ips(array & $ips = null){
-        return $this->get_client_ips($ips);
-    }
 
     /**
      * @param array|null $ips
@@ -105,17 +80,6 @@ class ipv4RangeCalc {
 		}
 	}
 
-	/**
-	 * Returns IP range  as a string, like "start_IP - end_IP" or only IP in range 
-	 * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
-	 *
-     * @deprecated
-	 * @return string
-	 */
-	function get_abons_ips_as_range(){
-        return $this->get_client_ips_as_range();
-	}
-
     /**
      * Returns IP range  as a string, like "start_IP - end_IP" or only IP in range
      * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
@@ -130,10 +94,45 @@ class ipv4RangeCalc {
             : ($first_ip." - ".$last_ip)
         ;
     }
-    
+
 	function is_ip_in($ip){
 		$ipl = ip2long($ip);
 		return (($ipl >= $this->ip_l) and ($ipl <= ($this->ip_l + $this->amount - 1)));
+	}
+
+    public static function parseCidr($ip){
+        $parts = explode('/', $ip, 2);
+        if (count($parts) < 2){
+            return [$ip, 0];
+        }
+        return $parts;
+    }
+
+    /**
+     * @deprecated
+     */
+	function get_brodcast_ip(){
+        return $this->get_broadcast_ip();
+    }
+
+    /**
+     * @param array|null $ips
+     * @return array
+     * @deprecated
+     */
+	function get_abons_ips(array & $ips = null){
+        return $this->get_client_ips($ips);
+    }
+
+	/**
+	 * Returns IP range  as a string, like "start_IP - end_IP" or only IP in range
+	 * Возвращает диапазон ИП вида "начальный_ИП - конечный_ИП" или единственный ИП
+	 *
+     * @deprecated
+	 * @return string
+	 */
+	function get_abons_ips_as_range(){
+        return $this->get_client_ips_as_range();
 	}
 }
 
