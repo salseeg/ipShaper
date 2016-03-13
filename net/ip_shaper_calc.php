@@ -18,7 +18,17 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 	static $uplink_iface = 'eth2';
 	static $downlink_iface = 'eth1';
 
-
+    static public function setOptions($options){
+        if (is_array($options)){
+            return false;
+        }
+        foreach ($options as $name => $value){
+            if (isset(self::$$name)){
+                self::$$name = $value;
+            }
+        }
+        return true;
+    }
 
 	
 
@@ -32,6 +42,11 @@ class ipv4ShaperRangeCalc extends ipv4RangeCalc {
 		$this->ht1_offset = $ht1_offset;
 		$this->ht2_offset = $ht2_offset;
 	}
+
+    /**
+     * @param $class
+     * @return bool|int
+     */
 	function ip_by_class($class){
 		if (
 			($class >= $this->class_offset )
